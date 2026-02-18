@@ -11,7 +11,7 @@ on:
     inputs:
       ref:
         description: "Tag or branch to deploy (empty for main)"
-        default: "main"
+        default: "v17.01.7"
         required: false
       target:
         description: "Single target to build (empty for all)"
@@ -45,6 +45,8 @@ jobs:
           export REF=${{ github.event.inputs.ref == 'master' && 'main' || github.event.inputs.ref }}
           echo "REF=$REF" >> "$GITHUB_ENV"
 
+          echo "GIT_REF_OPENWRT=main" >> "$GITHUB_ENV"
+
           case $REF in
             main)
               VERSION=SNAPSHOT
@@ -70,7 +72,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: openwrt/openwrt
-          ref: ${{ env.REF}}
+          ref: ${{ env.GIT_REF_OPENWRT}}
 
       - name: Set targets
         id: find_targets
