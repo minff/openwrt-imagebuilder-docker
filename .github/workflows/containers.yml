@@ -252,9 +252,9 @@ jobs:
           else
             cmd_setup="bash ./setup.sh"
           fi
-          
+
           mkdir -p bin
-          docker run --rm -v $PWD/bin:/builder/bin \
+          docker run --rm -u $(id -u):$(id -g) -v $PWD/bin:/builder/bin \
           ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd \$HOME && \
@@ -390,7 +390,7 @@ jobs:
           test_package=wireguard
 
           mkdir -p bin
-          docker run --rm -v $PWD/bin:/builder/bin \
+          docker run --rm -u $(id -u):$(id -g) -v $PWD/bin:/builder/bin \
           ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd \$HOME && \
