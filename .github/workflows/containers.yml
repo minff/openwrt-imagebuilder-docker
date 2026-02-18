@@ -14,7 +14,10 @@ on:
         default: "v17.01.7"
         required: false
       target:
-        description: "Single target to build (empty for all)"
+        description: |
+          Single target to build (empty for all). 
+          v17.01.1-v19.07.9: <target> <arch>. Example: ar71xx/generic mips_24kc.
+          Since v21.02.0: <target>. Example: ath79/generic.
         default: "ar71xx/generic mips_24kc" # ath79/generic
         required: false
       file_host:
@@ -372,17 +375,19 @@ jobs:
           else
             cmd_setup="bash ./setup.sh"
           fi
+          test_package=urngd # since v21
+          test_package=wireguard
           docker run --rm ${{ steps.build.outputs.imageid }} \
-          bash -c ' \
+          bash -c " \
             cd $HOME && \
             $cmd_setup && \
             make defconfig && \
-            sed -i -E "s;git.(openwrt|lede-project|[a-z0-9\-]+).org/(feed|project|openwrt);github.com/openwrt;" feeds.conf.default && \
+            sed -i -E \"s;git.(openwrt|lede-project|[a-z0-9\-]+).org/(feed|project|openwrt);github.com/openwrt;\" feeds.conf.default && \
             ./scripts/feeds update base && \
-            ./scripts/feeds install urngd && \
-            make package/urngd/{clean,compile} V=s -j$(nproc) && \
-            find ./bin/packages -name urngd*.?pk | grep ^./bin/packages/.*urngd \
-            '
+            ./scripts/feeds install $test_package && \
+            make package/$test_package/{clean,compile} V=s -j$(nproc) && \
+            find ./bin/packages -name $test_package*.?pk | grep ^./bin/packages/.*$test_package \
+            "
 
       - name: Push
         if: github.event_name != 'pull_request'
