@@ -254,10 +254,17 @@ jobs:
           fi
           docker run ${{ steps.build.outputs.imageid }} \
           bash -c " \
-            cd $HOME && \
+            cd \$HOME && \
             $cmd_setup && \
-            make image PACKAGES=coreutils-echo \
+            make image PROFILE=tl-wr841-v10 \
+            PACKAGES=\"wireguard luci-app-wireguard luci-proto-wireguard \
+            -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
+            luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap\"
             "
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bin-${{ matrix.target }}
+          path: bin/
 
       - name: Push
         if: github.event_name != 'pull_request'
@@ -379,13 +386,13 @@ jobs:
           test_package=wireguard
           docker run --rm ${{ steps.build.outputs.imageid }} \
           bash -c " \
-            cd $HOME && \
+            cd \$HOME && \
             $cmd_setup && \
             make defconfig && \
             sed -i -E \"s;git.(openwrt|lede-project|[a-z0-9\-]+).org/(feed|project|openwrt);github.com/openwrt;\" feeds.conf.default && \
             ./scripts/feeds update base && \
             ./scripts/feeds install $test_package && \
-            make package/$test_package/{clean,compile} V=s -j$(nproc) && \
+            make package/$test_package/{clean,compile} V=s -j\$(nproc) && \
             find ./bin/packages -name $test_package*.?pk | grep ^./bin/packages/.*$test_package \
             "
 
