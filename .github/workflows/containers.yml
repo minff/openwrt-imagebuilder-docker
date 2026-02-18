@@ -46,7 +46,7 @@ jobs:
           export REF=${{ github.event.inputs.ref == 'master' && 'main' || github.event.inputs.ref }}
           echo "REF=$REF" >> "$GITHUB_ENV"
 
-          echo "GIT_REF_OPENWRT=main" >> "$GITHUB_ENV"
+          echo "GIT_REF_OPENWRT=$REF" >> "$GITHUB_ENV"
 
           case $REF in
             main)
