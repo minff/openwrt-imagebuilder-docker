@@ -262,6 +262,7 @@ jobs:
             -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
             luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap\"
             "
+
       - uses: actions/upload-artifact@v4
         with:
           name: bin-${{ matrix.target }}
@@ -386,6 +387,7 @@ jobs:
           test_package=urngd # since v21
           test_package=wireguard
           docker run --rm ${{ steps.build.outputs.imageid }} \
+          -v $PWD/bin:/builder/bin \
           bash -c " \
             cd \$HOME && \
             $cmd_setup && \
@@ -396,6 +398,11 @@ jobs:
             make package/$test_package/{clean,compile} V=s -j\$(nproc) && \
             find ./bin/packages -name $test_package*.?pk | grep ^./bin/packages/.*$test_package \
             "
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: packages-${{ matrix.target }}
+          path: bin/
 
       - name: Push
         if: github.event_name != 'pull_request'
