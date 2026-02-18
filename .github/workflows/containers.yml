@@ -252,8 +252,8 @@ jobs:
           else
             cmd_setup="bash ./setup.sh"
           fi
-          docker run ${{ steps.build.outputs.imageid }} \
-          -v $PWD/bin:/builder/bin \
+          docker run --rm -v $PWD/bin:/builder/bin \
+          ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd \$HOME && \
             $cmd_setup && \
@@ -386,8 +386,8 @@ jobs:
           fi
           test_package=urngd # since v21
           test_package=wireguard
-          docker run --rm ${{ steps.build.outputs.imageid }} \
-          -v $PWD/bin:/builder/bin \
+          docker run --rm -v $PWD/bin:/builder/bin \
+          ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd \$HOME && \
             $cmd_setup && \
