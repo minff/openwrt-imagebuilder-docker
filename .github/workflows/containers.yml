@@ -15,7 +15,7 @@ on:
         required: false
       target:
         description: "Single target to build (empty for all)"
-        default: "ath79/generic" # ar71xx/generic
+        default: "ar71xx/generic mips_24kc" # ath79/generic
         required: false
       file_host:
         description: "File host to use (empty for default)"
@@ -87,9 +87,21 @@ jobs:
           JSON_ROOTFS='['
           FIRST_ROOTFS=1
 
-          if [ -e ./scripts/dump-target-info.pl ] ; then 
+          if [ -e ./scripts/dump-target-info.pl ] ; then
+            echo "TARGET_FILTER syntax: <target>"
+            echo "Example: TARGET_FILTER='ath79/generic'"
             echo -e "\n---- targets ----\n"
             perl ./scripts/dump-target-info.pl targets 2>/dev/null | ([[ -n "$TARGET_FILTER" ]] && grep -w "$TARGET_FILTER" || cat) | tee targets_info.txt
+          elif [ "$(echo "$TARGET_FILTER" | wc -w )" == "2" ] ; 
+            echo "dump-target-info.pl not exist. TARGET_FILTER syntax: <target> <arch>"
+            echo "Example: TARGET_FILTER='ar71xx/generic mips_24kc'"
+            echo -e "\n---- targets ----\n"
+            echo "$TARGET_FILTER" | tee targets_info.txt
+          else
+            echo "dump-target-info.pl not exist. TARGET_FILTER syntax: <target> <arch>"
+            echo "Example: TARGET_FILTER='ar71xx/generic mips_24kc'"
+            echo "TARGET_FILTER not valid: '$TARGET_FILTER'"
+            exit 1
           fi
 
           while read -r line;
