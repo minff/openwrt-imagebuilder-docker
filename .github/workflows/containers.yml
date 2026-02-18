@@ -252,6 +252,8 @@ jobs:
           else
             cmd_setup="bash ./setup.sh"
           fi
+          
+          mkdir -p bin
           docker run --rm -v $PWD/bin:/builder/bin \
           ${{ steps.build.outputs.imageid }} \
           bash -c " \
@@ -386,6 +388,8 @@ jobs:
           fi
           test_package=urngd # since v21
           test_package=wireguard
+
+          mkdir -p bin
           docker run --rm -v $PWD/bin:/builder/bin \
           ${{ steps.build.outputs.imageid }} \
           bash -c " \
