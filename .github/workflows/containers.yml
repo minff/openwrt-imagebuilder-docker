@@ -245,7 +245,7 @@ jobs:
             FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
             RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
 
-      - name: Smoke test
+      - name: Smoke test (build sysupgrade firmware)
         run: |
           if [ "${{ needs.generate_matrix.outputs.run_setup }}" == "1" ] ; then
             cmd_setup="echo skip setup.sh"
@@ -253,6 +253,7 @@ jobs:
             cmd_setup="bash ./setup.sh"
           fi
           docker run ${{ steps.build.outputs.imageid }} \
+          -v $PWD/bin:/builder/bin \
           bash -c " \
             cd \$HOME && \
             $cmd_setup && \
