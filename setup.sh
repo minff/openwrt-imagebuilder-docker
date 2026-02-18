@@ -8,10 +8,10 @@ DOWNLOAD_FILE="${DOWNLOAD_FILE:-imagebuilder-.*x86_64.tar.[xz|zst]}"
 DOWNLOAD_PATH="$VERSION_PATH/targets/$TARGET"
 
 wget -nv "$FILE_HOST/$DOWNLOAD_PATH/sha256sums" -O sha256sums
-wget -nv "$FILE_HOST/$DOWNLOAD_PATH/sha256sums.asc" -O sha256sums.asc || (
+wget -nv "$FILE_HOST/$DOWNLOAD_PATH/sha256sums.asc" -O sha256sums.asc && (
     gpg --import /builder/keys/*.asc && rm -rf /builder/keys/
     gpg --with-fingerprint --verify sha256sums.asc sha256sums
-)
+) || true
 
 # determine archive name
 file_name="$(grep "$DOWNLOAD_FILE" sha256sums | cut -d "*" -f 2)"
