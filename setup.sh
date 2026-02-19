@@ -31,8 +31,10 @@ tar xf "$file_name" --strip=1 --no-same-owner -C .
 rm -vrf "$file_name"
 
 # prepare python2
-curl -LsSf https://github.com/mamba-org/micromamba-releases/releases/download/2.5.0-2/micromamba-linux-64 -o micromamba
-chmod +x micromamba
+mkdir -p $HOME/.local/bin
+curl -LsSf https://github.com/mamba-org/micromamba-releases/releases/download/2.5.0-2/micromamba-linux-64 -o $HOME/.local/bin/micromamba
+chmod +x $HOME/.local/bin/micromamba
+export PATH=$HOME/.local/bin:$PATH
 micromamba create -n py27 python=2.7 -c conda-forge
 micromamba activate py27
 which python
