@@ -36,7 +36,6 @@ rm -vrf "$file_name"
 mkdir -p $HOME/.local/bin
 curl -LsSf https://github.com/mamba-org/micromamba-releases/releases/download/2.5.0-2/micromamba-linux-64 -o $HOME/.local/bin/micromamba
 chmod +x $HOME/.local/bin/micromamba
-export PATH=$HOME/.local/bin:$PATH
 micromamba create -n py27 python=2.7 -c conda-forge
 mkdir -p $HOME/micromamba
 micromamba shell init -s bash -r $HOME/micromamba
