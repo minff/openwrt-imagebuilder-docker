@@ -31,10 +31,9 @@ tar xf "$file_name" --strip=1 --no-same-owner -C .
 rm -vrf "$file_name"
 
 # prepare python2
-curl https://pyenv.run | bash
-export PATH="$HOME/.pyenv/bin:$PATH"
-pyenv install 2.7.18
-pyenv virtualenv 2.7.18 py27
-pyenv activate py27
+curl -LsSF https://github.com/mamba-org/micromamba-releases/releases/download/2.5.0-2/micromamba-linux-64 -o micromamba
+chmod +x micromamba
+micromamba create -n py27 python=2.7 -c conda-forge
+micromamba activate py27
 which python
 python --version
