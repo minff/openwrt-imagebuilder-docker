@@ -11,7 +11,7 @@ on:
     inputs:
       ref:
         description: "Tag or branch to deploy (empty for main)"
-        default: "v17.01.7"
+        default: "v18.06.9" # v17.01.7
         required: false
       target:
         description: |
@@ -19,7 +19,7 @@ on:
           v17.01.1: <target> <arch>. Example: ar71xx/generic mips_24kc.
           v18.06.9, v19.07.9: <target> <arch>. Example: ar71xx/tiny mips_24kc.
           Since v21.02.0: <target>. Example: ath79/generic.
-        default: "ar71xx/generic mips_24kc" # ath79/generic
+        default: "ar71xx/tiny mips_24kc" # ar71xx/generic mips_24kc
         required: false
       file_host:
         description: "File host to use (empty for default)"
