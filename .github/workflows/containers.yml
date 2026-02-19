@@ -247,6 +247,7 @@ jobs:
 
       - name: Push
         if: github.event_name != 'pull_request'
+        id: image_push
         uses: docker/build-push-action@v6
         with:
           push: true
@@ -270,7 +271,7 @@ jobs:
 
           mkdir -p bin
           docker run --name build \
-          ${{ steps.build.outputs.imageid }} \
+          ${{ steps.image_push.outputs.imageid }} \
           bash -c " \
             cd /builder && \
             $cmd_setup && \
@@ -383,6 +384,7 @@ jobs:
 
       - name: Push
         if: github.event_name != 'pull_request'
+        id: image_push
         uses: docker/build-push-action@v6
         with:
           push: true
@@ -413,7 +415,7 @@ jobs:
 
           mkdir -p bin
           docker run --name build -e FORCE=1 \
-          ${{ steps.build.outputs.imageid }} \
+          ${{ steps.image_push.outputs.imageid }} \
           bash -c " \
             cd /builder && \
             $cmd_setup && \
