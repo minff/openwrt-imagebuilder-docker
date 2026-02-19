@@ -41,6 +41,7 @@ micromamba create -n py27 python=2.7 -c conda-forge
 mkdir -p $HOME/micromamba
 micromamba shell init -s bash -r $HOME/micromamba
 . $HOME/.bashrc
+eval "$(micromamba shell hook -s bash )"
 micromamba activate py27
 which python
 python --version
