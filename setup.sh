@@ -31,12 +31,8 @@ tar xf "$file_name" --strip=1 --no-same-owner -C .
 rm -vrf "$file_name"
 
 # prepare python2
-curl -LsSf https://astral.sh/uv/install.sh | sh
-. $HOME/.local/bin/env
-set -x
-uv python pin 2.7
-uv python install
-uv python dir
-uv run python -V
+curl -L micro.mamba.pm/install.sh | sh
+micromamba create -n py27 python=2.7 -c conda-forge
+micromamba activate py27
 which python
-python -V
+python --version
