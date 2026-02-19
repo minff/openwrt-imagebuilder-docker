@@ -276,10 +276,11 @@ jobs:
           bash -c " \
             cd /builder && \
             . .bashrc && \
-            micromambda activate py27 && \
+            echo PATH=\$PATH && \
+            python --version && \
             $cmd_setup && \
             make info && \
-            make image PROFILE=tl-wr841-v10 \
+            make image PROFILE=tl-wr841-v10 FORCE=1 \
             PACKAGES=\"wireguard luci-app-wireguard luci-proto-wireguard \
             -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
             luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap\"
@@ -422,7 +423,8 @@ jobs:
           bash -c " \
             cd /builder && \
             . .bashrc && \
-            micromambda activate py27 && \
+            echo PATH=\$PATH && \
+            python --version && \
             $cmd_setup && \
             make defconfig && \
             sed -i -E \"s;git.(openwrt|lede-project).org/(feed|project|openwrt);github.com/openwrt;\" feeds.conf.default && \
