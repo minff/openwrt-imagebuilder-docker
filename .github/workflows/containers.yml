@@ -16,7 +16,8 @@ on:
       target:
         description: |
           Single target to build (empty for all). 
-          v17.01.1-v19.07.9: <target> <arch>. Example: ar71xx/generic mips_24kc.
+          v17.01.1: <target> <arch>. Example: ar71xx/generic mips_24kc.
+          v18.06.9, v19.07.9: <target> <arch>. Example: ar71xx/tiny mips_24kc.
           Since v21.02.0: <target>. Example: ath79/generic.
         default: "ar71xx/generic mips_24kc" # ath79/generic
         required: false
