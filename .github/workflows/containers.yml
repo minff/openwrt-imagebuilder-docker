@@ -264,7 +264,7 @@ jobs:
             -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
             luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap\"
             "
-          docker cp name:/builder/bin bin
+          docker cp build:/builder/bin bin
 
       - uses: actions/upload-artifact@v4
         with:
@@ -403,7 +403,7 @@ jobs:
             make package/$test_package/{clean,compile} V=s -j\$(nproc) && \
             find ./bin/packages -name $test_package*.?pk | grep ^./bin/packages/.*$test_package \
             "
-          docker cp name:/builder/bin bin
+          docker cp build:/builder/bin bin
 
       - uses: actions/upload-artifact@v4
         with:
