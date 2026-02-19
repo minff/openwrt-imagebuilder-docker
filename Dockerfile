@@ -22,7 +22,7 @@ ADD --chown=buildbot:buildbot keys/*.asc /builder/keys/
 COPY --chmod=0755 setup.sh /builder/setup.sh
 
 #
-ENV PATH="$PATH:/builder/.local/bin"
+ENV PATH="/builder/.local/bin:$PATH"
 #
 ARG RUN_SETUP=0
 ENV RUN_SETUP=$RUN_SETUP
