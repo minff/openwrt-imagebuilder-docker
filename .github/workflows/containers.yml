@@ -275,6 +275,7 @@ jobs:
           ${{ steps.image_push.outputs.imageid }} \
           bash -c " \
             cd /builder && \
+            . .bashrc && \
             micromambda activate py27 && \
             $cmd_setup && \
             make info && \
@@ -420,6 +421,7 @@ jobs:
           ${{ steps.image_push.outputs.imageid }} \
           bash -c " \
             cd /builder && \
+            . .bashrc && \
             micromambda activate py27 && \
             $cmd_setup && \
             make defconfig && \
