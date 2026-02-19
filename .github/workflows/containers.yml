@@ -245,6 +245,21 @@ jobs:
             FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
             RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
 
+      - name: Push
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          no-cache: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            DOWNLOAD_FILE=imagebuilder-.*x86_64.tar.[xz|zst]
+            VERSION_PATH=${{ needs.generate_matrix.outputs.version_path }}
+            TARGET=${{ matrix.target }}
+            FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
+            RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
+
       - name: Smoke test (build sysupgrade firmware)
         run: |
           if [ "${{ needs.generate_matrix.outputs.run_setup }}" == "1" ] ; then
@@ -271,21 +286,6 @@ jobs:
         with:
           name: bin-${{ inputs.ref }}
           path: bin/*
-
-      - name: Push
-        if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          no-cache: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            DOWNLOAD_FILE=imagebuilder-.*x86_64.tar.[xz|zst]
-            VERSION_PATH=${{ needs.generate_matrix.outputs.version_path }}
-            TARGET=${{ matrix.target }}
-            FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
-            RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
 
       - name: Cleanup Docker containers
         run: docker system prune -f
@@ -381,6 +381,26 @@ jobs:
             RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
           labels: ${{ steps.meta_ref.outputs.labels }}
 
+      - name: Push
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          no-cache: true
+          tags: |
+            ${{ steps.meta_ref.outputs.tags }}
+            ${{ steps.meta_version.outputs.tags }}
+            ${{ steps.meta_master.outputs.tags }}
+            ${{ steps.meta_target_arch.outputs.tags }}
+            ${{ steps.meta_latest.outputs.tags }}
+          build-args: |
+            DOWNLOAD_FILE=sdk-.*.Linux-x86_64.tar.[xz|zst]
+            VERSION_PATH=${{ needs.generate_matrix.outputs.version_path }}
+            TARGET=${{ matrix.target }}
+            FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
+            RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
+          labels: ${{ steps.meta_ref.outputs.labels }}
+
       - name: Smoke test
         run: |
           if [ "${{ needs.generate_matrix.outputs.run_setup }}" == "1" ] ; then
@@ -410,26 +430,6 @@ jobs:
         with:
           name: packages-${{ inputs.ref }}
           path: bin/*
-
-      - name: Push
-        if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          no-cache: true
-          tags: |
-            ${{ steps.meta_ref.outputs.tags }}
-            ${{ steps.meta_version.outputs.tags }}
-            ${{ steps.meta_master.outputs.tags }}
-            ${{ steps.meta_target_arch.outputs.tags }}
-            ${{ steps.meta_latest.outputs.tags }}
-          build-args: |
-            DOWNLOAD_FILE=sdk-.*.Linux-x86_64.tar.[xz|zst]
-            VERSION_PATH=${{ needs.generate_matrix.outputs.version_path }}
-            TARGET=${{ matrix.target }}
-            FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
-            RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
-          labels: ${{ steps.meta_ref.outputs.labels }}
 
       - name: Cleanup Docker containers
         run: docker system prune -f
