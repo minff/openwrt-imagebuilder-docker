@@ -32,11 +32,11 @@ rm -vrf "$file_name"
 
 # prepare python2
 curl -LsSf https://astral.sh/uv/install.sh | sh
-source $HOME/.local/bin/env
+. $HOME/.local/bin/env
 set -x
 uv python pin 2.7
 uv python install
 uv python dir
-uv rin python -V
+uv run python -V
 which python
 python -V
