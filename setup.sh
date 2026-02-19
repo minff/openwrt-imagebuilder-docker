@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -e
 
 # the inputs:
@@ -36,8 +38,9 @@ curl -LsSf https://github.com/mamba-org/micromamba-releases/releases/download/2.
 chmod +x $HOME/.local/bin/micromamba
 export PATH=$HOME/.local/bin:$PATH
 micromamba create -n py27 python=2.7 -c conda-forge
-eval "$(micromamba shell hook --shell bash)"
-micromamba shell init --shell bash --root-prefix=~/.local/share/mamba
+mkdir -p $HOME/micromamba
+micromamba shell init -s bash -r $HOME/micromamba
+. $HOME/.bashrc
 micromamba activate py27
 which python
 python --version
