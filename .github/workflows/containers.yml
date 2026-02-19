@@ -254,7 +254,7 @@ jobs:
           fi
 
           mkdir -p bin
-          docker run -u $(id -u):$(id -g) -v $PWD/bin:/builder/bin \
+          docker run --name build \
           ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd /builder && \
@@ -264,6 +264,7 @@ jobs:
             -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
             luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap\"
             "
+          docker cp name:/builder/bin bin
 
       - uses: actions/upload-artifact@v4
         with:
@@ -390,7 +391,7 @@ jobs:
           test_package=wireguard
 
           mkdir -p bin
-          docker run -u $(id -u):$(id -g) -v $PWD/bin:/builder/bin \
+          docker run --name build \
           ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd /builder && \
@@ -402,6 +403,7 @@ jobs:
             make package/$test_package/{clean,compile} V=s -j\$(nproc) && \
             find ./bin/packages -name $test_package*.?pk | grep ^./bin/packages/.*$test_package \
             "
+          docker cp name:/builder/bin bin
 
       - uses: actions/upload-artifact@v4
         with:
