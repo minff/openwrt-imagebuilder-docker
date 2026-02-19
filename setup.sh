@@ -29,3 +29,13 @@ rm -vrf sha256sums{,_min,.asc} keys/
 
 tar xf "$file_name" --strip=1 --no-same-owner -C .
 rm -vrf "$file_name"
+
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# prepare python2
+uv python pin 2
+uv python install
+uv python dir
+uv rin python -V
+which python
+python -V
