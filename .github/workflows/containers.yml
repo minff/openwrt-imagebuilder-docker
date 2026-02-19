@@ -259,6 +259,7 @@ jobs:
           bash -c " \
             cd /builder && \
             $cmd_setup && \
+            make info && \
             make image PROFILE=tl-wr841-v10 \
             PACKAGES=\"wireguard luci-app-wireguard luci-proto-wireguard \
             -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
@@ -269,7 +270,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: bin-${{ inputs.ref }}
-          path: bin/
+          path: bin/*
 
       - name: Push
         if: github.event_name != 'pull_request'
@@ -391,13 +392,13 @@ jobs:
           test_package=wireguard
 
           mkdir -p bin
-          docker run --name build \
+          docker run --name build -e FORCE=1 \
           ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd /builder && \
             $cmd_setup && \
             make defconfig && \
-            sed -i -E \"s;git.(openwrt|lede-project|[a-z0-9\-]+).org/(feed|project|openwrt);github.com/openwrt;\" feeds.conf.default && \
+            sed -i -E \"s;git.(openwrt|lede-project).org/(feed|project|openwrt);github.com/openwrt;\" feeds.conf.default && \
             ./scripts/feeds update base && \
             ./scripts/feeds install $test_package && \
             make package/$test_package/{clean,compile} V=s -j\$(nproc) && \
@@ -408,7 +409,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: packages-${{ inputs.ref }}
-          path: bin/
+          path: bin/*
 
       - name: Push
         if: github.event_name != 'pull_request'
