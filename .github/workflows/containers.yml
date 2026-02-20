@@ -272,7 +272,7 @@ jobs:
           path: bin/
 
       - name: Push
-        if: github.event_name != 'pull_request'
+        if: false
         uses: docker/build-push-action@v6
         with:
           push: true
@@ -411,7 +411,7 @@ jobs:
           path: bin/
 
       - name: Push
-        if: github.event_name != 'pull_request'
+        if: false
         uses: docker/build-push-action@v6
         with:
           push: true
@@ -512,7 +512,7 @@ jobs:
         run: docker run --platform=linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }} uname -m
 
       - name: Push
-        if: github.event_name != 'pull_request'
+        if: false
         uses: docker/build-push-action@v6
         with:
           no-cache: true
