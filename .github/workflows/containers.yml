@@ -434,7 +434,7 @@ jobs:
           test_package=wireguard
 
           image0="${{ steps.build.outputs.imageid }}"
-          image1="${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
+          image1="${{ fromJSON(steps.meta_target_arch.outputs.json).tags[0] }}"
 
           [ -n "$image0" ] && image="$image0" || image="$image1"
 
