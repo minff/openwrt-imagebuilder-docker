@@ -241,7 +241,7 @@ jobs:
             latest,enable=${{ needs.generate_matrix.outputs.version == 'SNAPSHOT' && matrix.target == 'x86/64'}}
 
       - name: Build
-        if: github.event.inputs.build_image == "true"
+        if: github.event.inputs.build_image == 'true'
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -382,7 +382,7 @@ jobs:
           tags: latest
 
       - name: Build
-        if: github.event.inputs.build_image == "true"
+        if: github.event.inputs.build_image == 'true'
         id: build
         uses: docker/build-push-action@v6
         with:
