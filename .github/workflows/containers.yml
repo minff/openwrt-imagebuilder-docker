@@ -236,6 +236,7 @@ jobs:
             latest,enable=${{ needs.generate_matrix.outputs.version == 'SNAPSHOT' && matrix.target == 'x86/64'}}
 
       - name: Build
+        if: false
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -274,9 +275,14 @@ jobs:
             cmd_setup="bash ./setup.sh"
           fi
 
+          image0="${{ steps.build.outputs.imageid }}"
+          image1="${{ steps.meta.outputs.tags[0] }}"
+
+          [ -n "$image0" ] && image="$image0" || image="$image1"
+
           mkdir -p bin
           docker run --name build \
-          ${{ steps.build.outputs.imageid }} \
+          $image \
           bash -c " \
             cd /builder && \
             . .bashrc && \
@@ -372,6 +378,7 @@ jobs:
           tags: latest
 
       - name: Build
+        if: false
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -422,8 +429,14 @@ jobs:
           test_package=urngd # since v21
           test_package=wireguard
 
+          image0="${{ steps.build.outputs.imageid }}"
+          image1="${{ steps.meta.outputs.tags[0] }}"
+
+          [ -n "$image0" ] && image="$image0" || image="$image1"
+
           mkdir -p bin
           docker run --name build \
+          $image \
           ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd /builder && \
