@@ -277,6 +277,8 @@ jobs:
 
           image0="${{ steps.build.outputs.imageid }}"
           image1="${{ steps.meta.outputs.tags[0] }}"
+          image2="${{ steps.meta.outputs.tags }}"
+          image3="${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
 
           [ -n "$image0" ] && image="$image0" || image="$image1"
 
