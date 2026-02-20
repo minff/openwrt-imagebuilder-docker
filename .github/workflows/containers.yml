@@ -9,10 +9,6 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
-      alias:
-        description: "Alias: Extra package name"
-        default: "wireguard"
-        required: false
       ref:
         description: "Tag or branch to deploy (empty for main)"
         default: "v18.06.9" # v17.01.7
@@ -24,6 +20,14 @@ on:
           v18.06.9, v19.07.9: <target> <arch>. Example: ar71xx/tiny mips_24kc.
           Since v21.02.0: <target>. Example: ath79/generic.
         default: "ar71xx/tiny mips_24kc" # ar71xx/generic mips_24kc
+        required: false
+      build_image:
+        description: "Set to build image"
+        default: false
+        required: false
+      alias:
+        description: "Alias: Extra package name"
+        default: "wireguard"
         required: false
       file_host:
         description: "File host to use (empty for default)"
@@ -236,7 +240,7 @@ jobs:
             latest,enable=${{ needs.generate_matrix.outputs.version == 'SNAPSHOT' && matrix.target == 'x86/64'}}
 
       - name: Build
-        if: false
+        if: github.event.inputs.build_image
         id: build
         uses: docker/build-push-action@v6
         with:
@@ -377,7 +381,7 @@ jobs:
           tags: latest
 
       - name: Build
-        if: false
+        if: github.event.inputs.build_image
         id: build
         uses: docker/build-push-action@v6
         with:
