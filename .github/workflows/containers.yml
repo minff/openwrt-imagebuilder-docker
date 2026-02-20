@@ -1,5 +1,5 @@
 name: Build and push containers
-run-name: ${{ inputs.ref }} ${{ inputs.target }}
+run-name: ${{ inputs.ref }} ${{ inputs.target }} ${{ inputs.alias }}
 
 env:
   FILE_HOST: https://mirror-03.infra.openwrt.org
@@ -9,6 +9,10 @@ on:
   pull_request:
   workflow_dispatch:
     inputs:
+      alias:
+        description: "Alias: Extra package name"
+        default: "wireguard"
+        required: false
       ref:
         description: "Tag or branch to deploy (empty for main)"
         default: "v18.06.9" # v17.01.7
