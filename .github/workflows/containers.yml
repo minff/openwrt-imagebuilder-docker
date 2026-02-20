@@ -24,6 +24,7 @@ on:
       build_image:
         description: "Set to build image"
         default: false
+        type: boolean
         required: false
       alias:
         description: "Alias: Extra package name"
