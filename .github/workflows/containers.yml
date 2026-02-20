@@ -282,6 +282,7 @@ jobs:
             make info && \
             make image PROFILE=tl-wr841-v10 FORCE=1 \
             PACKAGES=\"wireguard luci-app-wireguard luci-proto-wireguard \
+            -iw-full \
             -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
             luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap\"
             "
