@@ -397,7 +397,7 @@ jobs:
             cd /builder && \
             $cmd_setup && \
             make defconfig && \
-            sed -i -E \"s;git.(openwrt|lede-project|[a-z0-9\-]+).org/(feed|project|openwrt);github.com/openwrt;\" feeds.conf.default && \
+            sed -i -E \"s;git.(openwrt|lede-project|).org/(feed|project|openwrt);github.com/openwrt;\" feeds.conf.default && \
             ./scripts/feeds update base && \
             ./scripts/feeds install $test_package && \
             make package/$test_package/{clean,compile} V=s -j\$(nproc) && \
