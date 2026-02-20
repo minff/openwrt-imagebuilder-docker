@@ -247,7 +247,7 @@ jobs:
             RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
 
       - name: Push
-        if: github.event_name != 'pull_request'
+        if: false
         id: image_push
         uses: docker/build-push-action@v6
         with:
@@ -272,7 +272,7 @@ jobs:
 
           mkdir -p bin
           docker run --name build \
-          ${{ steps.image_push.outputs.imageid }} \
+          ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd /builder && \
             . .bashrc && \
@@ -387,7 +387,7 @@ jobs:
           labels: ${{ steps.meta_ref.outputs.labels }}
 
       - name: Push
-        if: github.event_name != 'pull_request'
+        if: false
         id: image_push
         uses: docker/build-push-action@v6
         with:
@@ -419,7 +419,7 @@ jobs:
 
           mkdir -p bin
           docker run --name build \
-          ${{ steps.image_push.outputs.imageid }} \
+          ${{ steps.build.outputs.imageid }} \
           bash -c " \
             cd /builder && \
             . .bashrc && \
@@ -523,7 +523,7 @@ jobs:
         run: docker run --platform=linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }} uname -m
 
       - name: Push
-        if: github.event_name != 'pull_request'
+        if: false
         uses: docker/build-push-action@v6
         with:
           no-cache: true
