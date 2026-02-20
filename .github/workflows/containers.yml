@@ -435,6 +435,7 @@ jobs:
             sed -i -E -e \"s;git.(openwrt|lede-project|).org/(feed|project|openwrt);github.com/openwrt;\" \
             -e \"s;git.(openwrt|lede-project|).org/source;github.com/openwrt/openwrt;\" \
             feeds.conf.default && \
+            cat feeds.conf.default && \
             ./scripts/feeds install $test_package && \
             make package/$test_package/{clean,compile} V=s -j\$(nproc) && \
             find ./bin/packages -name $test_package*.?pk | grep ^./bin/packages/.*$test_package \
