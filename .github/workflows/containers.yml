@@ -1,5 +1,5 @@
 name: Build and push containers
-run-name: ${{ inputs.ref }} ${{ inputs.target }}
+run-name: ${{ inputs.ref }} ${{ inputs.target }} ${{ inputs.alias }}
 
 env:
   FILE_HOST: https://mirror-03.infra.openwrt.org
@@ -16,9 +16,19 @@ on:
       target:
         description: |
           Single target to build (empty for all). 
-          v17.01.1-v19.07.9: <target> <arch>. Example: ar71xx/generic mips_24kc.
+          v17.01.1: <target> <arch>. Example: ar71xx/generic mips_24kc.
+          v18.06.9, v19.07.9: <target> <arch>. Example: ar71xx/tiny mips_24kc.
           Since v21.02.0: <target>. Example: ath79/generic.
-        default: "ar71xx/generic mips_24kc" # ath79/generic
+        default: "ar71xx/generic mips_24kc" # ar71xx/tiny mips_24kc
+        required: false
+      build_image:
+        description: "Set to build image"
+        default: false
+        type: boolean
+        required: false
+      alias:
+        description: "Alias: Extra package name"
+        default: "wireguard"
         required: false
       file_host:
         description: "File host to use (empty for default)"
@@ -231,11 +241,28 @@ jobs:
             latest,enable=${{ needs.generate_matrix.outputs.version == 'SNAPSHOT' && matrix.target == 'x86/64'}}
 
       - name: Build
+        if: github.event.inputs.build_image == 'true'
         id: build
         uses: docker/build-push-action@v6
         with:
           no-cache: true
           push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            DOWNLOAD_FILE=imagebuilder-.*x86_64.tar.[xz|zst]
+            VERSION_PATH=${{ needs.generate_matrix.outputs.version_path }}
+            TARGET=${{ matrix.target }}
+            FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
+            RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
+
+      - name: Push
+        if: false
+        id: image_push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          no-cache: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
@@ -253,38 +280,31 @@ jobs:
             cmd_setup="bash ./setup.sh"
           fi
 
+          image0="${{ steps.build.outputs.imageid }}"
+          image1="${{ fromJSON(steps.meta.outputs.json).tags[0] }}"
+
+          [ -n "$image0" ] && image="$image0" || image="$image1"
+
           mkdir -p bin
           docker run --name build \
-          ${{ steps.build.outputs.imageid }} \
+          $image \
           bash -c " \
             cd /builder && \
+            python --version && \
             $cmd_setup && \
+            mkdir -p bin && make info > bin/device_info.txt && \
             make image PROFILE=tl-wr841-v10 \
             PACKAGES=\"wireguard luci-app-wireguard luci-proto-wireguard \
             -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
-            luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap\"
+            luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap \
+            \" \
             "
           docker cp build:/builder/bin bin
 
       - uses: actions/upload-artifact@v4
         with:
-          name: bin
-          path: bin/
-
-      - name: Push
-        if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          no-cache: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            DOWNLOAD_FILE=imagebuilder-.*x86_64.tar.[xz|zst]
-            VERSION_PATH=${{ needs.generate_matrix.outputs.version_path }}
-            TARGET=${{ matrix.target }}
-            FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
-            RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
+          name: bin-${{ inputs.ref }}
+          path: bin/*
 
       - name: Cleanup Docker containers
         run: docker system prune -f
@@ -361,11 +381,33 @@ jobs:
           tags: latest
 
       - name: Build
+        if: github.event.inputs.build_image == 'true'
         id: build
         uses: docker/build-push-action@v6
         with:
           no-cache: true
           push: false
+          tags: |
+            ${{ steps.meta_ref.outputs.tags }}
+            ${{ steps.meta_version.outputs.tags }}
+            ${{ steps.meta_master.outputs.tags }}
+            ${{ steps.meta_target_arch.outputs.tags }}
+            ${{ steps.meta_latest.outputs.tags }}
+          build-args: |
+            DOWNLOAD_FILE=sdk-.*.Linux-x86_64.tar.[xz|zst]
+            VERSION_PATH=${{ needs.generate_matrix.outputs.version_path }}
+            TARGET=${{ matrix.target }}
+            FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
+            RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
+          labels: ${{ steps.meta_ref.outputs.labels }}
+
+      - name: Push
+        if: false
+        id: image_push
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          no-cache: true
           tags: |
             ${{ steps.meta_ref.outputs.tags }}
             ${{ steps.meta_version.outputs.tags }}
@@ -390,16 +432,23 @@ jobs:
           test_package=urngd # since v21
           test_package=wireguard
 
+          image0="${{ steps.build.outputs.imageid }}"
+          image1="${{ fromJSON(steps.meta_ref.outputs.json).tags[0] }}"
+
+          [ -n "$image0" ] && image="$image0" || image="$image1"
+
           mkdir -p bin
           docker run --name build \
-          ${{ steps.build.outputs.imageid }} \
+          $image \
           bash -c " \
             cd /builder && \
+            python --version && \
             $cmd_setup && \
             make defconfig && \
             sed -i -E -e \"s;git.(openwrt|lede-project|).org/(feed|project|openwrt);github.com/openwrt;\" \
             -e \"s;git.(openwrt|lede-project|).org/source;github.com/openwrt/openwrt;\" \
             feeds.conf.default && \
+            cat feeds.conf.default && \
             ./scripts/feeds update base && \
             ./scripts/feeds install $test_package && \
             make package/$test_package/{clean,compile} V=s -j\$(nproc) && \
@@ -409,28 +458,8 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: packages
-          path: bin/
-
-      - name: Push
-        if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          no-cache: true
-          tags: |
-            ${{ steps.meta_ref.outputs.tags }}
-            ${{ steps.meta_version.outputs.tags }}
-            ${{ steps.meta_master.outputs.tags }}
-            ${{ steps.meta_target_arch.outputs.tags }}
-            ${{ steps.meta_latest.outputs.tags }}
-          build-args: |
-            DOWNLOAD_FILE=sdk-.*.Linux-x86_64.tar.[xz|zst]
-            VERSION_PATH=${{ needs.generate_matrix.outputs.version_path }}
-            TARGET=${{ matrix.target }}
-            FILE_HOST=${{ needs.generate_matrix.outputs.file_host }}
-            RUN_SETUP=${{ needs.generate_matrix.outputs.run_setup }}
-          labels: ${{ steps.meta_ref.outputs.labels }}
+          name: packages-${{ inputs.ref }}
+          path: bin/*
 
       - name: Cleanup Docker containers
         run: docker system prune -f
@@ -514,7 +543,7 @@ jobs:
         run: docker run --platform=linux/${{ matrix.arch }} ${{ steps.build.outputs.imageid }} uname -m
 
       - name: Push
-        if: github.event_name != 'pull_request'
+        if: false
         uses: docker/build-push-action@v6
         with:
           no-cache: true
