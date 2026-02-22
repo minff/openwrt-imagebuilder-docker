@@ -19,8 +19,12 @@ on:
           v17.01.1: <target> <arch>. Example: ar71xx/generic mips_24kc.
           v18.06.9, v19.07.9: <target> <arch>. Example: ar71xx/tiny mips_24kc.
           Since v21.02.0: <target>. Example: ath79/generic.
-        default: "ar71xx/generic mips_24kc" # ar71xx/tiny mips_24kc
+        default: "brcm47xx/legacy mipsel" # ar71xx/tiny mips_24kc
         required: false
+      device_profile:
+        description: "Device profile for firmware build"
+        default: "asus-wl-330ge" # tl-wr841-v10
+        type: string        
       build_image:
         description: "Set to build image"
         default: false
@@ -293,7 +297,7 @@ jobs:
             python --version && \
             $cmd_setup && \
             mkdir -p bin && make info > bin/device_info.txt && \
-            make image PROFILE=tl-wr841-v10 \
+            make image PROFILE="${{ github.event.inputs.device_profile }}" \
             PACKAGES=\"wireguard luci-app-wireguard luci-proto-wireguard \
             -ppp -ppp-mod-pppoe -opkg uhttpd uhttpd-mod-ubus libiwinfo-lua \
             luci-base luci-app-firewall luci-mod-admin-full luci-theme-bootstrap \
